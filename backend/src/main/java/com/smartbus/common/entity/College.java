@@ -9,14 +9,14 @@ public class College {
     @Id
     private String id;
     private String name;
-    private String code;
-    private String timezone;
-    private boolean active;
+    private String code = "TEST";
+    private String timezone = "UTC";
+    private Boolean active = true;
     
     @Column(name = "created_at")
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
     @Column(name = "updated_at")
-    private Instant updatedAt;
+    private Instant updatedAt = Instant.now();
 
     // Getters and Setters
     public String getId() { return id; }
@@ -27,8 +27,8 @@ public class College {
     public void setCode(String code) { this.code = code; }
     public String getTimezone() { return timezone; }
     public void setTimezone(String timezone) { this.timezone = timezone; }
-    public boolean isActive() { return active; }
-    public void setActive(boolean active) { this.active = active; }
+    public Boolean getActive() { return active; }
+    public void setActive(Boolean active) { this.active = active; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }

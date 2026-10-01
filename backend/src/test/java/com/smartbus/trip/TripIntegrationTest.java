@@ -40,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@org.springframework.transaction.annotation.Transactional
 public class TripIntegrationTest {
 
     @Autowired
@@ -76,7 +77,7 @@ public class TripIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        locationPointRepository.deleteAll();
+        locationPointRepository.deleteAll(); tripRepository.deleteAll(); 
         latestBusLocationRepository.deleteAll();
         tripRepository.deleteAll();
         busRepository.deleteAll();

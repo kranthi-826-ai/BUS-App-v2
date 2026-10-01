@@ -23,12 +23,12 @@ public class User {
     private String passwordHash;
     
     private String role;
-    private String status;
+    private String status = "ACTIVE";
     
     @Column(name = "created_at")
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
     @Column(name = "updated_at")
-    private Instant updatedAt;
+    private Instant updatedAt = Instant.now();
 
     // Getters and Setters
     public String getId() { return id; }
