@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, Button, StyleSheet, Alert } from 'react-native';
-import { api } from '../../api';
+import { api } from '../api';
 
 interface Student {
     id: string;
@@ -16,12 +16,12 @@ export const AttendanceScreen = ({ route }: any) => {
     useEffect(() => {
         // Fetch students enrolled in this bus
         api.get(`/transport/enrolments/bus/${busId}`)
-            .then(res => setStudents(res.data.map((e: any) => ({
+            .then((res: any) => setStudents(res.data.map((e: any) => ({
                 id: e.studentId,
                 name: e.studentName || 'Unknown Student',
                 attendanceStatus: null
             }))))
-            .catch(err => console.warn('Failed to load students', err))
+            .catch((err: any) => console.warn('Failed to load students', err))
             .finally(() => setLoading(false));
     }, [busId]);
 

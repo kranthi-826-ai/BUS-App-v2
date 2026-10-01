@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Switch, Button, StyleSheet, Alert } from 'react-native';
-import { api } from '../../api';
-import { usePushNotifications } from '../../features/alert/usePushNotifications';
+import { api } from '../api';
+import { usePushNotifications } from '../features/alert/usePushNotifications';
 
 export const AlertSettingsScreen = () => {
     const { expoPushToken } = usePushNotifications();

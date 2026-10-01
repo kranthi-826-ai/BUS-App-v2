@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useAuth } from '../../features/auth/AuthContext';
-import * as tripApi from '../../api/trip';
-import { startLocationTracking, stopLocationTracking } from '../../background/LocationPublisher';
+import { useAuth } from '../features/auth/AuthContext';
+import * as tripApi from '../api/trip';
+import { startLocationTracking, stopLocationTracking } from '../background/LocationPublisher';
 
 export const InChargeDashboard = () => {
     const { logout } = useAuth();

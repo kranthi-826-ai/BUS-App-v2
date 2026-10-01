@@ -15,7 +15,7 @@ import { ActivityIndicator, View } from 'react-native';
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
-  const { isAuthenticated, checkAuth } = useAuth();
+  const { isAuthenticated, role, checkAuth } = useAuth();
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
