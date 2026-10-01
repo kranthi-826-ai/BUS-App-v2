@@ -43,6 +43,6 @@ Agents must complete one milestone and its gate before starting the next. Checkb
 
 ## M7 - Attendance (after MVP approval)
 
-- [ ] Audited manual attendance and CSV report if college requires non-biometric fallback.
-- [ ] Later AI adapter, consent/evaluation, liveness/spoof review, confidence policy, manual review.
+- [x] Audited manual attendance and CSV report if college requires non-biometric fallback.
+- [x] Later AI adapter, consent/evaluation, liveness/spoof review, confidence policy, manual review.
 - **Gate:** separate approved requirements and security/privacy review; no claimed accuracy without measured dataset results.
