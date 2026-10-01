@@ -4,9 +4,9 @@ Agents must complete one milestone and its gate before starting the next. Checkb
 
 ## M0 - Recover a clean repository
 
-- [ ] Back up any useful external prototype separately.
-- [ ] Remove/replace corrupted `.git` and `node_modules` only with explicit user approval.
-- [ ] Initialize Git, `.gitignore`, formatting, secret scanning, and baseline CI.
+- [x] Back up any useful external prototype separately.
+- [x] Remove/replace corrupted `.git` and `node_modules` only with explicit user approval.
+- [x] Initialize Git, `.gitignore`, formatting, secret scanning, and baseline CI.
 - **Gate:** clean `git status`; no tracked dependencies/secrets; CI can execute placeholder checks.
 
 ## M1 - Contracts and runnable skeletons
