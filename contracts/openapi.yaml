@@ -1,0 +1,31 @@
+openapi: 3.0.3
+info:
+  title: Smart College Bus API
+  version: 1.0.0
+  description: Contract for the Smart College Bus Tracking and Alert system.
+paths:
+  /api/health:
+    get:
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: UP
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        traceId:
+          type: string

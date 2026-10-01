@@ -11,9 +11,9 @@ Agents must complete one milestone and its gate before starting the next. Checkb
 
 ## M1 - Contracts and runnable skeletons
 
-- [ ] Create `mobile/` with Expo SDK 57 TypeScript strict development-build workflow.
-- [ ] Create `backend/` with Java 21, Spring Boot 4.1.x, Maven Wrapper.
-- [ ] Create OpenAPI, Flyway baseline, profiles, health endpoint, and local compose/native-MySQL instructions.
+- [x] Create `mobile/` with Expo SDK 57 TypeScript strict development-build workflow.
+- [x] Create `backend/` with Java 21, Spring Boot 4.1.x, Maven Wrapper.
+- [x] Create OpenAPI, Flyway baseline, profiles, health endpoint, and local compose/native-MySQL instructions.
 - **Gate:** mobile typecheck/lint/test; backend `./mvnw verify`; database migration from empty succeeds.
 
 ## M2 - Authentication and authorization
