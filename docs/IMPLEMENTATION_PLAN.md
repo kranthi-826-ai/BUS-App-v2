@@ -18,7 +18,7 @@ Agents must complete one milestone and its gate before starting the next. Checkb
 
 ## M2 - Authentication and authorization
 
-- [ ] Approved account seed/import, secure login/refresh/logout, SecureStore, roles, audit events, rate limits.
+- [x] Approved account seed/import, secure login/refresh/logout, SecureStore, roles, audit events, rate limits.
 - **Gate:** positive/negative integration tests including refresh reuse, disabled user, cross-role access, and no secret leakage.
 
 ## M3 - Transport configuration and enrolment
