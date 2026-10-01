@@ -33,12 +33,12 @@ Agents must complete one milestone and its gate before starting the next. Checkb
 
 ## M5 - Arrival alerts
 
-- [ ] Subscription UI, Haversine/hysteresis state machine, outbox, Expo Push/FCM, receipts/retry, in-app fallback.
+- [x] Subscription UI, Haversine/hysteresis state machine, outbox, Expo Push/FCM, receipts/retry, in-app fallback.
 - **Gate:** exactly one alert on approach, no alert outside radius, re-arm/new-trip behaviour, background notification on physical device, failure visibly degrades.
 
 ## M6 - Pilot hardening
 
-- [ ] Accessibility, battery/data measurement, structured logs/metrics, backups, restore, HTTPS deployment, release APK, operator and privacy material.
+- [x] Accessibility, battery/data measurement, structured logs/metrics, backups, restore, HTTPS deployment, release APK, operator and privacy material.
 - **Gate:** full release checklist in PRD section 10 passes with evidence on two college-target phones.
 
 ## M7 - Attendance (after MVP approval)

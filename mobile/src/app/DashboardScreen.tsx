@@ -14,10 +14,18 @@ export const DashboardScreen = () => {
 
             <View style={styles.buttonContainer}>
                 {role === 'STUDENT' && (
-                    <Button 
-                        title="Enrol in a Bus Route" 
-                        onPress={() => navigation.navigate('RouteSelection')} 
-                    />
+                    <>
+                        <Button 
+                            title="Enrol in a Bus Route" 
+                            onPress={() => navigation.navigate('RouteSelection')} 
+                        />
+                        <View style={{height: 15}} />
+                        <Button 
+                            title="Configure Arrival Alerts" 
+                            onPress={() => navigation.navigate('AlertSettings')} 
+                            color="#28a745"
+                        />
+                    </>
                 )}
             </View>
 

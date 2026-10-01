@@ -7,7 +7,9 @@ import { LoginScreen } from './src/app/LoginScreen';
 import { DashboardScreen } from './src/app/DashboardScreen';
 import { RouteSelectionScreen } from './src/app/RouteSelectionScreen';
 import { StopSelectionScreen } from './src/app/StopSelectionScreen';
+import { AlertSettingsScreen } from './src/app/AlertSettingsScreen';
 import { InChargeDashboard } from './src/app/InChargeDashboard';
+import { AttendanceScreen } from './src/app/AttendanceScreen';
 import { ActivityIndicator, View } from 'react-native';
 
 const Stack = createNativeStackNavigator();
@@ -34,12 +36,16 @@ const Navigation = () => {
         {!isAuthenticated ? (
           <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         ) : role === 'STAFF' ? (
-          <Stack.Screen name="InChargeDashboard" component={InChargeDashboard} options={{ title: 'In-Charge Home' }} />
+          <>
+            <Stack.Screen name="InChargeDashboard" component={InChargeDashboard} options={{ title: 'In-Charge Home' }} />
+            <Stack.Screen name="Attendance" component={AttendanceScreen} options={{ title: 'Attendance' }} />
+          </>
         ) : (
           <>
             <Stack.Screen name="Dashboard" component={DashboardScreen} />
             <Stack.Screen name="RouteSelection" component={RouteSelectionScreen} options={{ title: 'Select Route' }} />
             <Stack.Screen name="StopSelection" component={StopSelectionScreen} options={{ title: 'Select Stop' }} />
+            <Stack.Screen name="AlertSettings" component={AlertSettingsScreen} options={{ title: 'Alert Settings' }} />
           </>
         )}
       </Stack.Navigator>

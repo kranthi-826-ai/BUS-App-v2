@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../features/auth/AuthContext';
 import * as tripApi from '../../api/trip';
 import { startLocationTracking, stopLocationTracking } from '../../background/LocationPublisher';
 
 export const InChargeDashboard = () => {
     const { logout } = useAuth();
+    const navigation = useNavigation<any>();
     const [activeTrip, setActiveTrip] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -53,6 +55,8 @@ export const InChargeDashboard = () => {
                     <View style={styles.activeContainer}>
                         <Text style={styles.activeText}>Trip is ACTIVE</Text>
                         <Text style={styles.subText}>Location is being shared in the background.</Text>
+                        <Button title="Mark Attendance" onPress={() => navigation.navigate('Attendance', { tripId: activeTrip, busId: selectedBus })} />
+                        <View style={{height: 15}} />
                         <Button title="End Trip" color="red" onPress={handleEndTrip} disabled={loading} />
                     </View>
                 )}
