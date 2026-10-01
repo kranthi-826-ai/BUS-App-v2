@@ -23,7 +23,7 @@ Agents must complete one milestone and its gate before starting the next. Checkb
 
 ## M3 - Transport configuration and enrolment
 
-- [ ] College, buses, routes, ordered stops, assignments, hashed expiring bus codes, student stop selection.
+- [x] College, buses, routes, ordered stops, assignments, hashed expiring bus codes, student stop selection.
 - **Gate:** no hardcoded business data in mobile; invalid/expired/wrong-bus code tests; seed data produces a usable pilot route.
 
 ## M4 - Real trip/location pipeline
