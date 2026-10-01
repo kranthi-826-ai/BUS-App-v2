@@ -1,0 +1,38 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+dist/
+build/
+.npm/
+
+# Java / Spring Boot
+target/
+*.class
+*.jar
+*.war
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Mobile
+.expo/
+android/app/build/
+ios/build/
+
+# Secrets (NEVER COMMIT)
+.env
+.env.*
+!*.example
+*.pem
+*.key
+keystore.jks
+
+# Backup
+backup_prototype/
