@@ -7,6 +7,7 @@ import { LoginScreen } from './src/app/LoginScreen';
 import { DashboardScreen } from './src/app/DashboardScreen';
 import { RouteSelectionScreen } from './src/app/RouteSelectionScreen';
 import { StopSelectionScreen } from './src/app/StopSelectionScreen';
+import { InChargeDashboard } from './src/app/InChargeDashboard';
 import { ActivityIndicator, View } from 'react-native';
 
 const Stack = createNativeStackNavigator();
@@ -32,6 +33,8 @@ const Navigation = () => {
       <Stack.Navigator>
         {!isAuthenticated ? (
           <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        ) : role === 'STAFF' ? (
+          <Stack.Screen name="InChargeDashboard" component={InChargeDashboard} options={{ title: 'In-Charge Home' }} />
         ) : (
           <>
             <Stack.Screen name="Dashboard" component={DashboardScreen} />

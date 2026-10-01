@@ -28,7 +28,7 @@ Agents must complete one milestone and its gate before starting the next. Checkb
 
 ## M4 - Real trip/location pipeline
 
-- [ ] Trip lifecycle, background foreground-service publisher, bounded offline queue, batch ingest, latest location, stale state, map marker/route/stops.
+- [x] Trip lifecycle, background foreground-service publisher, bounded offline queue, batch ingest, latest location, stale state, map marker/route/stops.
 - **Gate:** physical in-charge phone continues publishing in background; student phone tracks it; authorization, duplicate, stale, invalid, and reconnect tests pass.
 
 ## M5 - Arrival alerts
