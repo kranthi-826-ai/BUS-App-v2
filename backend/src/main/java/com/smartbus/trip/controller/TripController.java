@@ -15,6 +15,12 @@ import java.security.Principal;
 public class TripController {
     private final TripService tripService;
 
+    @GetMapping("/active")
+    @PreAuthorize("hasAnyRole('STUDENT', 'STAFF', 'ADMIN')")
+    public ResponseEntity<java.util.List<TripResponse>> getActiveTrips() {
+        return ResponseEntity.ok(tripService.getActiveTrips());
+    }
+
     @PostMapping
     @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
     public ResponseEntity<TripResponse> startTrip(@Valid @RequestBody StartTripRequest request, Principal principal) {
@@ -24,8 +30,8 @@ public class TripController {
 
     @PostMapping("/{tripId}/end")
     @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
-    public ResponseEntity<TripResponse> endTrip(@PathVariable String tripId) {
-        TripResponse res = tripService.endTrip(tripId);
+    public ResponseEntity<TripResponse> endTrip(@PathVariable String tripId, Principal principal) {
+        TripResponse res = tripService.endTrip(tripId, principal.getName());
         return ResponseEntity.ok(res);
     }
 
@@ -37,6 +43,7 @@ public class TripController {
     }
 
     @GetMapping("/{tripId}/locations/latest")
+    @PreAuthorize("hasAnyRole('STUDENT', 'STAFF', 'ADMIN')")
     public ResponseEntity<LocationResponse> getLatestLocation(@PathVariable String tripId) {
         LocationResponse res = tripService.getLatestLocation(tripId);
         return ResponseEntity.ok(res);

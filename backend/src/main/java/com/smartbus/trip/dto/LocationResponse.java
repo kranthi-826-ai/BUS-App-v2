@@ -13,4 +13,5 @@ public class LocationResponse {
     private Double speed;
     private Double heading;
     private Instant capturedTime;
+    private boolean stale;
 }

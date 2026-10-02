@@ -6,6 +6,9 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 
 public interface InchargeAssignmentRepository extends JpaRepository<InchargeAssignment, String> {
+       @Query("SELECT COUNT(a) > 0 FROM InchargeAssignment a WHERE a.user.id = :userId AND a.bus.id = :busId AND a.validFrom <= :date AND (a.validTo IS NULL OR a.validTo >= :date)")
+       boolean isAssignedToBusOnDate(@Param("userId") String userId, @Param("busId") String busId, @Param("date") LocalDate date);
+
     @Query("SELECT COUNT(a) > 0 FROM InchargeAssignment a WHERE a.user.id = :userId AND " +
            "(cast(:validTo as date) IS NULL OR a.validFrom <= :validTo) AND " +
            "(a.validTo IS NULL OR a.validTo >= :validFrom)")

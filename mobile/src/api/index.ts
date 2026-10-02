@@ -1,8 +1,7 @@
 import axios from 'axios';
 import { getAccessToken, getRefreshToken, saveTokens, clearTokens } from '../storage/secureStore';
 
-// Assuming local dev server IP (change if running on device)
-const BASE_URL = 'http://localhost:8080/api';
+const BASE_URL = `${process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8080'}/api`;
 
 export const api = axios.create({
     baseURL: BASE_URL,

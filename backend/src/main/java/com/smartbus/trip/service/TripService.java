@@ -6,6 +6,7 @@ import com.smartbus.transport.entity.Bus;
 import com.smartbus.transport.entity.Route;
 import com.smartbus.transport.repository.BusRepository;
 import com.smartbus.transport.repository.RouteRepository;
+import com.smartbus.transport.repository.InchargeAssignmentRepository;
 import com.smartbus.trip.dto.*;
 import com.smartbus.trip.entity.*;
 import com.smartbus.trip.repository.*;
@@ -27,6 +28,7 @@ public class TripService {
     private final LatestBusLocationRepository latestBusLocationRepository;
     private final BusRepository busRepository;
     private final RouteRepository routeRepository;
+    private final InchargeAssignmentRepository inchargeAssignmentRepository;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -45,6 +47,11 @@ public class TripService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        if (!inchargeAssignmentRepository.isAssignedToBusOnDate(
+            userId, request.getBusId(), java.time.LocalDate.now())) {
+            throw new IllegalArgumentException("In-charge is not assigned to this bus");
+        }
+
         Trip trip = new Trip();
         trip.setBus(bus);
         trip.setRoute(route);
@@ -57,12 +64,21 @@ public class TripService {
     }
 
     @Transactional
-    public TripResponse endTrip(String tripId) {
+    public TripResponse endTrip(String tripId, String userId) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new IllegalArgumentException("Trip not found"));
         
         if (trip.getStatus() != TripStatus.ACTIVE) {
             throw new IllegalArgumentException("Trip is not active");
+        }
+
+        if (!userId.equals(trip.getIncharge().getId())) {
+            throw new IllegalArgumentException("Only the trip's in-charge can end the trip");
+        }
+
+        if (!inchargeAssignmentRepository.isAssignedToBusOnDate(
+                trip.getIncharge().getId(), trip.getBus().getId(), java.time.LocalDate.now())) {
+            throw new IllegalArgumentException("In-charge is not assigned to this bus");
         }
         
         trip.setStatus(TripStatus.ENDED);
@@ -163,7 +179,14 @@ public class TripService {
         res.setSpeed(latestLoc.getSpeed());
         res.setHeading(latestLoc.getHeading());
         res.setCapturedTime(latestLoc.getCapturedTime());
+        res.setStale(latestLoc.getCapturedTime().isBefore(Instant.now().minus(45, ChronoUnit.SECONDS)));
         return res;
+    }
+
+    public List<TripResponse> getActiveTrips() {
+        return tripRepository.findByStatus(TripStatus.ACTIVE).stream()
+                .map(this::mapToTripResponse)
+                .toList();
     }
 
     private TripResponse mapToTripResponse(Trip trip) {
