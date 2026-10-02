@@ -17,8 +17,12 @@ public class TripController {
 
     @GetMapping("/active")
     @PreAuthorize("hasAnyRole('STUDENT', 'STAFF', 'ADMIN')")
-    public ResponseEntity<java.util.List<TripResponse>> getActiveTrips() {
-        return ResponseEntity.ok(tripService.getActiveTrips());
+    public ResponseEntity<java.util.List<TripResponse>> getActiveTrips(Principal principal, org.springframework.security.core.Authentication authentication) {
+        String role = authentication.getAuthorities().stream()
+                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .filter(authority -> authority.startsWith("ROLE_"))
+                .findFirst().orElse("");
+        return ResponseEntity.ok(tripService.getActiveTrips(principal.getName(), role));
     }
 
     @PostMapping
@@ -44,8 +48,12 @@ public class TripController {
 
     @GetMapping("/{tripId}/locations/latest")
     @PreAuthorize("hasAnyRole('STUDENT', 'STAFF', 'ADMIN')")
-    public ResponseEntity<LocationResponse> getLatestLocation(@PathVariable String tripId) {
-        LocationResponse res = tripService.getLatestLocation(tripId);
+    public ResponseEntity<LocationResponse> getLatestLocation(@PathVariable String tripId, Principal principal, org.springframework.security.core.Authentication authentication) {
+        String role = authentication.getAuthorities().stream()
+                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .filter(authority -> authority.startsWith("ROLE_"))
+                .findFirst().orElse("");
+        LocationResponse res = tripService.getLatestLocation(tripId, principal.getName(), role);
         return ResponseEntity.ok(res);
     }
 }

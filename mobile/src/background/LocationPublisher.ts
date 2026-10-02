@@ -1,7 +1,7 @@
 import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { api } from '../api/index';
+import { submitLocations } from '../api/trip';
 
 const LOCATION_TASK_NAME = 'background-location-task';
 const OFFLINE_QUEUE_KEY = 'location_offline_queue';
@@ -18,31 +18,52 @@ interface LocationPoint {
     heading?: number;
 }
 
-// Global states to inject into the task (not reliable across reloads, but good enough for active tracking in-memory)
-let currentTripId: string | null = null;
-let currentDeviceId: string = "device-" + Math.random().toString(36).substring(7); // In reality, use Application.androidId
-let sequenceCounter = 0;
+const TRACKING_SESSION_KEY = 'active_location_tracking_session';
+const LOCATION_DEVICE_ID_KEY = 'location_device_id';
+const LOCATION_SEQUENCE_KEY = 'location_sequence';
+const MAX_QUEUED_POINTS = 100;
+const LOCATION_BATCH_SIZE = 20;
+
+interface TrackingSession {
+    tripId: string;
+    deviceId: string;
+}
 
 export const startLocationTracking = async (tripId: string) => {
+    if (!(await TaskManager.isAvailableAsync())) {
+        throw new Error('Background location requires an installed development or release build.');
+    }
+    if (!(await Location.hasServicesEnabledAsync())) {
+        throw new Error('Enable device location services before starting a trip.');
+    }
+
     const { status: fgStatus } = await Location.requestForegroundPermissionsAsync();
     if (fgStatus !== 'granted') throw new Error('Foreground permission denied');
 
     const { status: bgStatus } = await Location.requestBackgroundPermissionsAsync();
     if (bgStatus !== 'granted') throw new Error('Background permission denied');
 
-    currentTripId = tripId;
-    sequenceCounter = 0;
+    const session = { tripId, deviceId: await getOrCreateDeviceId() };
+    await AsyncStorage.setItem(TRACKING_SESSION_KEY, JSON.stringify(session));
 
-    await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-        accuracy: Location.Accuracy.High,
-        timeInterval: 10000,
-        distanceInterval: 10,
-        foregroundService: {
-            notificationTitle: 'Smart Bus',
-            notificationBody: 'Sharing live location with students',
-            notificationColor: '#007bff'
+    try {
+        if (!(await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME))) {
+            await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+                accuracy: Location.Accuracy.High,
+                timeInterval: 5000,
+                distanceInterval: 10,
+                foregroundService: {
+                    notificationTitle: 'Smart Bus trip in progress',
+                    notificationBody: 'Your bus location is being shared with enrolled students.',
+                    notificationColor: '#155e4b',
+                    killServiceOnDestroy: true,
+                },
+            });
         }
-    });
+    } catch (error) {
+        await AsyncStorage.removeItem(TRACKING_SESSION_KEY);
+        throw error;
+    }
 };
 
 export const stopLocationTracking = async () => {
@@ -50,8 +71,22 @@ export const stopLocationTracking = async () => {
     if (isRegistered) {
         await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
     }
-    currentTripId = null;
     await syncOfflineQueue();
+    await AsyncStorage.removeItem(TRACKING_SESSION_KEY);
+};
+
+const getOrCreateDeviceId = async (): Promise<string> => {
+    const existingId = await AsyncStorage.getItem(LOCATION_DEVICE_ID_KEY);
+    if (existingId) return existingId;
+    const deviceId = `device-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+    await AsyncStorage.setItem(LOCATION_DEVICE_ID_KEY, deviceId);
+    return deviceId;
+};
+
+const getNextSequence = async (): Promise<number> => {
+    const sequence = Number(await AsyncStorage.getItem(LOCATION_SEQUENCE_KEY) ?? '0') + 1;
+    await AsyncStorage.setItem(LOCATION_SEQUENCE_KEY, String(sequence));
+    return sequence;
 };
 
 const getOfflineQueue = async (): Promise<LocationPoint[]> => {
@@ -60,20 +95,28 @@ const getOfflineQueue = async (): Promise<LocationPoint[]> => {
 };
 
 const saveOfflineQueue = async (queue: LocationPoint[]) => {
-    // Bound the queue to latest 100 points
-    const bounded = queue.slice(-100);
+    const bounded = queue.slice(-MAX_QUEUED_POINTS);
     await AsyncStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(bounded));
 };
 
 const syncOfflineQueue = async () => {
-    const queue = await getOfflineQueue();
-    if (queue.length === 0) return;
+    let queue = await getOfflineQueue();
+    while (queue.length > 0) {
+        const sessionValue = await AsyncStorage.getItem(TRACKING_SESSION_KEY);
+        if (!sessionValue) return;
+        const session = JSON.parse(sessionValue) as TrackingSession;
+        const points = queue.filter((point) => point.tripId === session.tripId && point.deviceId === session.deviceId).slice(0, LOCATION_BATCH_SIZE);
+        if (points.length === 0) return;
 
-    try {
-        await api.post('/trip/locations/batch', { points: queue });
-        await AsyncStorage.removeItem(OFFLINE_QUEUE_KEY);
-    } catch (e) {
-        console.warn('Failed to sync offline queue, will retry later', e);
+        try {
+            await submitLocations(session.tripId, session.deviceId, points);
+            const sentSequences = new Set(points.map((point) => point.sequenceNum));
+            queue = queue.filter((point) => !sentSequences.has(point.sequenceNum));
+            await saveOfflineQueue(queue);
+        } catch (e) {
+            console.warn('Failed to sync location updates; queued points will retry.', e);
+            return;
+        }
     }
 };
 
@@ -83,25 +126,27 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
         return;
     }
     
-    if (data && (data as any).locations) {
-        const locations = (data as any).locations;
-        const newPoints: LocationPoint[] = locations.map((loc: any) => {
-            sequenceCounter++;
-            return {
-                tripId: currentTripId,
-                deviceId: currentDeviceId,
-                sequenceNum: sequenceCounter,
-                capturedTime: new Date(loc.timestamp).toISOString(),
-                latitude: loc.coords.latitude,
-                longitude: loc.coords.longitude,
-                accuracy: loc.coords.accuracy,
-                speed: loc.coords.speed,
-                heading: loc.coords.heading
-            };
-        });
+    if (data && 'locations' in data && Array.isArray(data.locations)) {
+        const sessionValue = await AsyncStorage.getItem(TRACKING_SESSION_KEY);
+        if (!sessionValue) return;
+        const session = JSON.parse(sessionValue) as TrackingSession;
+        const validPoints: LocationPoint[] = [];
 
-        // Filter out if tripId is somehow missing
-        const validPoints = newPoints.filter(p => p.tripId);
+        for (const location of data.locations) {
+            if (location.coords.accuracy != null && location.coords.accuracy > 100) continue;
+            validPoints.push({
+                tripId: session.tripId,
+                deviceId: session.deviceId,
+                sequenceNum: await getNextSequence(),
+                capturedTime: new Date(location.timestamp).toISOString(),
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                accuracy: location.coords.accuracy ?? undefined,
+                speed: location.coords.speed ?? undefined,
+                heading: location.coords.heading ?? undefined,
+            });
+        }
+
         if (validPoints.length === 0) return;
 
         const queue = await getOfflineQueue();

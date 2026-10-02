@@ -7,6 +7,7 @@ import com.smartbus.transport.entity.Route;
 import com.smartbus.transport.repository.BusRepository;
 import com.smartbus.transport.repository.RouteRepository;
 import com.smartbus.transport.repository.InchargeAssignmentRepository;
+import com.smartbus.transport.repository.StudentEnrolmentRepository;
 import com.smartbus.trip.dto.*;
 import com.smartbus.trip.entity.*;
 import com.smartbus.trip.repository.*;
@@ -29,6 +30,7 @@ public class TripService {
     private final BusRepository busRepository;
     private final RouteRepository routeRepository;
     private final InchargeAssignmentRepository inchargeAssignmentRepository;
+    private final StudentEnrolmentRepository studentEnrolmentRepository;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -64,7 +66,7 @@ public class TripService {
     }
 
     @Transactional
-    public TripResponse endTrip(String tripId, String userId) {
+    public TripResponse endTrip(String tripId, String userId, boolean administrator) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new IllegalArgumentException("Trip not found"));
         
@@ -72,7 +74,7 @@ public class TripService {
             throw new IllegalArgumentException("Trip is not active");
         }
 
-        if (!userId.equals(trip.getIncharge().getId())) {
+        if (!administrator && !userId.equals(trip.getIncharge().getId())) {
             throw new IllegalArgumentException("Only the trip's in-charge can end the trip");
         }
 
@@ -166,7 +168,18 @@ public class TripService {
         }
     }
 
-    public LocationResponse getLatestLocation(String tripId) {
+    public LocationResponse getLatestLocation(String tripId, String userId, String role) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new IllegalArgumentException("Trip not found"));
+
+        boolean administrator = role.equals("ROLE_ADMIN");
+        boolean assignedIncharge = trip.getIncharge().getId().equals(userId);
+        boolean enrolledStudent = studentEnrolmentRepository.existsByStudentIdAndBusIdAndStatus(
+                userId, trip.getBus().getId(), "ACTIVE");
+        if (!administrator && !assignedIncharge && !enrolledStudent) {
+            throw new IllegalArgumentException("User is not enrolled in or assigned to this bus");
+        }
+
         LatestBusLocation latestLoc = latestBusLocationRepository.findById(tripId)
                 .orElseThrow(() -> new IllegalArgumentException("Latest location not found"));
 
@@ -183,8 +196,13 @@ public class TripService {
         return res;
     }
 
-    public List<TripResponse> getActiveTrips() {
+        public List<TripResponse> getActiveTrips(String userId, String role) {
+        boolean administrator = role.equals("ROLE_ADMIN");
         return tripRepository.findByStatus(TripStatus.ACTIVE).stream()
+            .filter(trip -> administrator
+                || trip.getIncharge().getId().equals(userId)
+                || studentEnrolmentRepository.existsByStudentIdAndBusIdAndStatus(
+                    userId, trip.getBus().getId(), "ACTIVE"))
                 .map(this::mapToTripResponse)
                 .toList();
     }
