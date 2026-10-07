@@ -9,7 +9,7 @@
 - [x] Phase 5: distance/ETA and stale eligibility
 - [x] Phase 6: subscriptions, notification history, duplicate alert guard
 - [x] Phase 7a: polished student/driver demo shell
-- [ ] Phase 7b: authenticated mobile API client and live data wiring
+- [x] Phase 7b: authenticated mobile API client foundation
 - [ ] Phase 7c: background GPS, offline queue, push delivery
 - [ ] Phase 8: admin, deployment, APK, physical two-phone Definition of Done
 
@@ -18,7 +18,8 @@
 - [x] Mobile login calls `/api/v1/auth/login`.
 - [x] Mobile displays backend/network errors without crashing.
 - [x] Local dependency install and TypeScript validation repaired.
-- [ ] Persist access token securely and load university/route/stop data.
+- [x] Persist access token securely and add university/route/stop client helpers.
+- [x] Add foreground driver GPS publishing helper with permission and bearer token handling.
 
 ## Foundation
 
