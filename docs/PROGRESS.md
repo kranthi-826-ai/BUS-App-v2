@@ -1,5 +1,24 @@
 # Build progress
 
+## Master checklist
+
+- [x] Phase 1: foundation, Flyway, MySQL compose, mobile shell
+- [x] Phase 2: password hashing, JWT issue, roles, dev seed
+- [x] Phase 3: university/route/stop catalog and GPS validation
+- [x] Phase 4: trip start/end, batch locations, latest location
+- [x] Phase 5: distance/ETA and stale eligibility
+- [x] Phase 6: subscriptions, notification history, duplicate alert guard
+- [x] Phase 7a: polished student/driver demo shell
+- [ ] Phase 7b: authenticated mobile API client and live data wiring
+- [ ] Phase 7c: background GPS, offline queue, push delivery
+- [ ] Phase 8: admin, deployment, APK, physical two-phone Definition of Done
+
+### Phase 7b current work
+
+- [x] Mobile login calls `/api/v1/auth/login`.
+- [x] Mobile displays backend/network errors without crashing.
+- [ ] Persist access token securely and load university/route/stop data.
+
 ## Foundation
 
 - Started clean rebuild from the supplied master prompt.
