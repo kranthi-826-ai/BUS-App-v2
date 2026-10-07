@@ -5,3 +5,4 @@
 - Provide Android Google Maps key for release builds, or approve the documented map fallback.
 - Provide Expo/EAS account only when building a distributable APK.
 - Obtain college permission and driver consent for GPS tracking during active trips.
+- Start Docker Desktop before running the container build; compose configuration validates, but the local Docker engine was unavailable on 2026-10-07.

@@ -24,6 +24,8 @@
 - [x] Add authenticated notification polling for unread alerts.
 - [x] Persist pending driver locations locally and retry them in ordered batches.
 - [ ] Register device push tokens and deliver push notifications.
+- [x] Add production-style backend Docker image and API/MySQL compose stack.
+- [ ] Verify Docker image with a running local Docker engine.
 
 ## Foundation
 
