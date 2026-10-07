@@ -1,5 +1,7 @@
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import { registerPushToken } from '../api/client';
+import { getAccessToken } from '../api/secure';
 
 export async function registerForPushNotifications(): Promise<string> {
   if (!Device.isDevice) throw new Error('Push notifications require a physical device');
@@ -13,4 +15,10 @@ export async function registerForPushNotifications(): Promise<string> {
 
 export async function showArrivalAlarm(title: string, body: string): Promise<void> {
   await Notifications.scheduleNotificationAsync({content:{title,body,sound:'default'},trigger:null});
+}
+
+export async function registerPushWithBackend(): Promise<void> {
+  const [expoPushToken,accessToken]=await Promise.all([registerForPushNotifications(),getAccessToken()]);
+  if(!accessToken) throw new Error('Sign in again');
+  await registerPushToken(accessToken,expoPushToken);
 }

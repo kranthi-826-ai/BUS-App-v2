@@ -44,3 +44,7 @@ export async function getNotifications(token:string, studentId:string) {
   if(!response.ok) throw new Error('Unable to load notifications');
   return response.json() as Promise<Array<{id:string;message:string;read:boolean;createdAt:string}>>;
 }
+export async function registerPushToken(token:string, expoPushToken:string) {
+  const response=await fetch(API_URL + '/api/v1/device-push-tokens',{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer ' + token},body:JSON.stringify({expoPushToken,platform:'android'})});
+  if(!response.ok) throw new Error('Unable to register device notifications');
+}

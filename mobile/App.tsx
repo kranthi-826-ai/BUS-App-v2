@@ -4,6 +4,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { getAccessToken } from './src/api/secure';
 import { getRoutes, getStops, getUniversities, login, startTrip, endTrip, saveSubscription, getNotifications } from './src/api/client';
 import { publishCurrentLocation } from './src/background/driverLocation';
+import { registerPushWithBackend } from './src/notifications/registerPush';
 
 const languages = ['English', 'తెలుగు', 'हिन्दी'];
 
@@ -18,6 +19,7 @@ export default function App() {
   const [tripId, setTripId] = useState<string | null>(null);
   const [driverId, setDriverId] = useState<string | null>(null);
   const [unread, setUnread] = useState(0);
+  useEffect(() => { if(driverId) registerPushWithBackend().catch(()=>undefined); }, [driverId]);
   const setAlarm = async () => { try { const token=await getAccessToken(); if(!token || !driverId) throw new Error('Sign in again'); await saveSubscription(token,driverId,'00000000-0000-0000-0000-000000000008',lead); Alert.alert('Alarm ready',`You will be alerted ${lead} minutes before the bus reaches your stop.`); } catch(error) { Alert.alert('Alarm failed',error instanceof Error ? error.message : 'Try again'); } };
   useEffect(() => { if (!tripId || !driverId) return; const timer=setInterval(() => publishCurrentLocation(tripId, driverId).catch(error => Alert.alert('GPS update failed', error instanceof Error ? error.message : 'Try again')), 10000); publishCurrentLocation(tripId, driverId).catch(()=>undefined); return () => clearInterval(timer); }, [tripId, driverId]);
   useEffect(() => { if (screen !== 'student' || !driverId) return; const tokenPromise=getAccessToken(); tokenPromise.then(token => { if (token) saveSubscription(token,driverId,'00000000-0000-0000-0000-000000000008',lead).catch(()=>undefined); }); }, [lead, screen, driverId]);
