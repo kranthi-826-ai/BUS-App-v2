@@ -42,3 +42,9 @@
 
 - Added student stop/lead-time subscription endpoint.
 - Added notification history and read-state endpoints.
+
+## Phase 6 alert evaluator
+
+- Added ETA-gated alert evaluation.
+- Added unique notification insertion for one-alert-per-student/stop/trip behavior.
+- Stale locations are never alert eligible.

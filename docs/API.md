@@ -21,5 +21,6 @@ All endpoints use `/api/v1`, JSON, UTC ISO-8601 timestamps, and structured error
 - `PUT /subscription`
 - `GET /subscription?studentId={studentId}`
 - `POST /notifications/{id}/read`
+- `POST /alerts/evaluate?studentId={studentId}&tripId={tripId}&stopId={stopId}&leadMinutes=10`
 
 Provider credentials are server-side configuration only. Student clients never receive provider tokens.
