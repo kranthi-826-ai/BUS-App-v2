@@ -6,12 +6,13 @@ import { getRoutes, getStops, getUniversities, login, startTrip, endTrip, saveSu
 import { publishCurrentLocation } from './src/background/driverLocation';
 import { registerPushWithBackend } from './src/notifications/registerPush';
 import { startBackgroundDriverLocation, stopBackgroundDriverLocation } from './src/background/backgroundLocation';
+import { AdminDashboard } from './src/admin/AdminDashboard';
 
 const languages = ['English', 'తెలుగు', 'हिन्दी'];
 
 export default function App() {
   const [language, setLanguage] = useState('English');
-  const [screen, setScreen] = useState<'language'|'login'|'student'|'driver'>('language');
+  const [screen, setScreen] = useState<'language'|'login'|'student'|'driver'|'admin'>('language');
   const [email, setEmail] = useState('student@test.com');
   const [password, setPassword] = useState('student123');
   const [lead, setLead] = useState(10);
