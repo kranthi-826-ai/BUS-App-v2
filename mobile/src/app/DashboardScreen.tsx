@@ -51,6 +51,7 @@ interface RouteStop {
 
 const LOCATION_POLL_INTERVAL_MS = 10_000;
 const STALE_AFTER_MS = 45_000;
+const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
 const DEFAULT_REGION: Region = {
   latitude: 17.545862,
   longitude: 78.404297,
@@ -128,39 +129,33 @@ export const DashboardScreen = () => {
 
   return (
     <View style={styles.container}>
-      <MapView
-        style={styles.map}
-        region={mapRegion}
-        showsUserLocation={true}
-        provider={PROVIDER_GOOGLE}
-        showsCompass
-        toolbarEnabled={false}
-      >
-        {location && !locationIsStale && (
-          <Marker
-            coordinate={{ latitude: location.latitude, longitude: location.longitude }}
-            title="Live bus location"
-            description={activeTrip ? `Trip ${activeTrip.id}` : 'Active bus'}
-            anchor={{ x: 0.5, y: 0.5 }}
-          >
-            <View style={styles.busMarker}>
-              <Ionicons name="bus" size={20} color="#fff" />
-            </View>
-          </Marker>
-        )}
-        {stops.map(({ id, sequenceNum, stop }) => (
-          <Marker
-            key={id}
-            coordinate={{ latitude: stop.latitude, longitude: stop.longitude }}
-            title={`${sequenceNum}. ${stop.name}`}
-            anchor={{ x: 0.5, y: 0.5 }}
-          >
-            <View style={styles.stopMarker}>
-              <View style={styles.stopMarkerInner} />
-            </View>
-          </Marker>
-        ))}
-      </MapView>
+      {GOOGLE_MAPS_API_KEY ? (
+        <MapView
+          style={styles.map}
+          region={mapRegion}
+          showsUserLocation={true}
+          provider={PROVIDER_GOOGLE}
+          showsCompass
+          toolbarEnabled={false}
+        >
+          {location && !locationIsStale && (
+            <Marker coordinate={{ latitude: location.latitude, longitude: location.longitude }} title="Live bus location" description={activeTrip ? `Trip ${activeTrip.id}` : 'Active bus'} anchor={{ x: 0.5, y: 0.5 }}>
+              <View style={styles.busMarker}><Ionicons name="bus" size={20} color="#fff" /></View>
+            </Marker>
+          )}
+          {stops.map(({ id, sequenceNum, stop }) => (
+            <Marker key={id} coordinate={{ latitude: stop.latitude, longitude: stop.longitude }} title={`${sequenceNum}. ${stop.name}`} anchor={{ x: 0.5, y: 0.5 }}>
+              <View style={styles.stopMarker}><View style={styles.stopMarkerInner} /></View>
+            </Marker>
+          ))}
+        </MapView>
+      ) : (
+        <View style={styles.mapUnavailable}>
+          <Ionicons name="map-outline" size={48} color="#18864b" />
+          <Text style={styles.mapUnavailableTitle}>Map preview unavailable</Text>
+          <Text style={styles.mapUnavailableText}>Add EXPO_PUBLIC_GOOGLE_MAPS_API_KEY and rebuild the Android app to enable maps.</Text>
+        </View>
+      )}
 
       <View style={styles.topActions}>
         <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('AlertSettings')}>
@@ -227,6 +222,9 @@ export const DashboardScreen = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#edf2f3' },
   map: { width: Dimensions.get('window').width, height: Dimensions.get('window').height },
+  mapUnavailable: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#e7efeb', paddingHorizontal: 36 },
+  mapUnavailableTitle: { color: '#18332a', fontSize: 20, fontWeight: '800', marginTop: 14 },
+  mapUnavailableText: { color: '#566661', fontSize: 14, lineHeight: 21, textAlign: 'center', marginTop: 8 },
   topActions: {
     position: 'absolute',
     top: 54,

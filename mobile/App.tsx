@@ -12,6 +12,7 @@ import { InChargeDashboard } from './src/app/InChargeDashboard';
 import { AttendanceScreen } from './src/app/AttendanceScreen';
 import { ActivityIndicator, View, Text, StyleSheet, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const Stack = createNativeStackNavigator();
 
@@ -96,11 +97,13 @@ const Navigation = () => {
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <AuthProvider>
-        <Navigation />
-      </AuthProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <AuthProvider>
+          <Navigation />
+        </AuthProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
