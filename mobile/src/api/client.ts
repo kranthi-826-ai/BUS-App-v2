@@ -24,8 +24,8 @@ export async function getStops(token:string, routeId:string) {
   const response=await fetch(`${API_URL}/api/v1/routes/${routeId}/stops`,{headers:{Authorization:`Bearer ${token}`}});
   if(!response.ok) throw new Error('Unable to load stops'); return response.json() as Promise<Array<{id:string;name:string;sequence:number;plannedArrival:string|null}>>;
 }
-export async function startTrip(token:string, routeId:string, driverId:string) {
+export async function startTrip(token:string, routeId:string, driverId:string, busId:string) {
   const response=await fetch(`${API_URL}/api/v1/trips/start`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({routeId,startedBy:driverId})});
-  if(!response.ok) throw new Error('Unable to start trip'); return response.json() as Promise<{tripId:string}>;
+  if(!response.ok) throw new Error('Unable to start trip'); const result=await response.json() as {id:string}; return {tripId:result.id};
 }
 export async function endTrip(token:string, tripId:string) { await fetch(`${API_URL}/api/v1/trips/${tripId}/end`,{method:'POST',headers:{Authorization:`Bearer ${token}`}}); }
