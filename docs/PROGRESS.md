@@ -17,6 +17,7 @@
 
 - [x] Mobile login calls `/api/v1/auth/login`.
 - [x] Mobile displays backend/network errors without crashing.
+- [x] Local dependency install and TypeScript validation repaired.
 - [ ] Persist access token securely and load university/route/stop data.
 
 ## Foundation
