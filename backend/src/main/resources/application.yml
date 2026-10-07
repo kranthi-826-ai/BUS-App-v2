@@ -1,5 +1,6 @@
 spring:
   application.name: smartbus-backend
+  profiles.default: dev
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:smartbus}
     username: ${DB_USER:smartbus}
@@ -7,4 +8,5 @@ spring:
   jpa.hibernate.ddl-auto: validate
   flyway.enabled: true
 server.port: ${SERVER_PORT:8080}
+smartbus.jwt.secret: ${JWT_SECRET:dev-only-change-this-secret-to-at-least-32-bytes}
 management.endpoints.web.exposure.include: health,info
