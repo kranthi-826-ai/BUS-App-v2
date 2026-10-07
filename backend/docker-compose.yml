@@ -1,0 +1,12 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: smartbus
+      MYSQL_USER: smartbus
+      MYSQL_PASSWORD: smartbus_dev_only
+      MYSQL_ROOT_PASSWORD: root_dev_only
+    ports: ["3306:3306"]
+    volumes: ["smartbus_mysql:/var/lib/mysql"]
+volumes:
+  smartbus_mysql:
