@@ -31,3 +31,9 @@
 - Added trip start/end endpoints.
 - Added ordered batch location ingestion with accepted/rejected counts.
 - Added latest-location retrieval with stale-state calculation.
+
+## Phase 5 ETA foundation
+
+- Added Haversine distance and ETA calculation.
+- Added minimum-speed handling so stopped buses never produce infinite ETA.
+- Added stale-location guard; stale data is never alert eligible.
