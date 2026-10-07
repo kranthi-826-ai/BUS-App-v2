@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Alert, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { getAccessToken } from './src/api/secure';
-import { getRoutes, getStops, getUniversities, login, startTrip, endTrip } from './src/api/client';
+import { getRoutes, getStops, getUniversities, login, startTrip, endTrip, saveSubscription } from './src/api/client';
 import { publishCurrentLocation } from './src/background/driverLocation';
 
 const languages = ['English', 'తెలుగు', 'हिन्दी'];
@@ -17,6 +17,7 @@ export default function App() {
   const [catalog, setCatalog] = useState('Loading university routes…');
   const [tripId, setTripId] = useState<string | null>(null);
   const [driverId, setDriverId] = useState<string | null>(null);
+  const setAlarm = async () => { try { const token=await getAccessToken(); if(!token || !driverId) throw new Error('Sign in again'); await saveSubscription(token,driverId,'00000000-0000-0000-0000-000000000008',lead); Alert.alert('Alarm ready',`You will be alerted ${lead} minutes before the bus reaches your stop.`); } catch(error) { Alert.alert('Alarm failed',error instanceof Error ? error.message : 'Try again'); } };
   useEffect(() => { if (!tripId || !driverId) return; const timer=setInterval(() => publishCurrentLocation(tripId, driverId).catch(error => Alert.alert('GPS update failed', error instanceof Error ? error.message : 'Try again')), 10000); publishCurrentLocation(tripId, driverId).catch(()=>undefined); return () => clearInterval(timer); }, [tripId, driverId]);
   useEffect(() => { if (screen !== 'student') return; let active=true; (async()=>{ try { const token=await getAccessToken(); if(!token) return; const universities=await getUniversities(token); const university=universities[0]; if(!university) return; const routes=await getRoutes(token,university.id); const route=routes[0]; if(!route) return; const stops=await getStops(token,route.id); if(active) setCatalog(`${university.name} · ${route.name} · ${stops.length} stops loaded`); } catch(e) { if(active) setCatalog(e instanceof Error ? e.message : 'Catalog unavailable'); } })(); return ()=>{active=false}; }, [screen]);
   if (screen === 'login') return <Shell><Text style={styles.kicker}>SMART COLLEGE BUS</Text><Text style={styles.title}>Welcome back.</Text><Text style={styles.subtitle}>Sign in to your college transport account.</Text><TextInput autoCapitalize="none" value={email} onChangeText={setEmail} placeholder="College email" style={styles.input}/><TextInput secureTextEntry value={password} onChangeText={setPassword} placeholder="Password" style={styles.input}/><TouchableOpacity style={styles.primary} onPress={async () => { try { const result=await login(email,password); setDriverId(result.userId); setScreen(result.role==='DRIVER'?'driver':'student'); } catch(error) { Alert.alert('Sign-in failed', error instanceof Error ? error.message : 'Try again'); } }}><Text style={styles.primaryText}>Sign in</Text></TouchableOpacity><TouchableOpacity onPress={() => setScreen('language')}><Text style={styles.link}>Change language</Text></TouchableOpacity></Shell>;
