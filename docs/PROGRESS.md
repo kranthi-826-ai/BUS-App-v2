@@ -30,6 +30,9 @@
 - [x] Add production-style backend Docker image and API/MySQL compose stack.
 - [ ] Verify Docker image with a running local Docker engine.
 - [x] Add GitHub Actions gates for backend tests and mobile strict type checking.
+- [x] Add JWT signature/claim and filter authentication regression tests.
+- [x] Route administrators into the visible mobile operations dashboard.
+- [x] Present active-trip live coordinates in the student tracking card; map tiles remain gated on a map-key/provider decision.
 
 ## Foundation
 
