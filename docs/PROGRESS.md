@@ -26,6 +26,7 @@
 - [ ] Register device push tokens and deliver push notifications.
 - [x] Add production-style backend Docker image and API/MySQL compose stack.
 - [ ] Verify Docker image with a running local Docker engine.
+- [x] Add GitHub Actions gates for backend tests and mobile strict type checking.
 
 ## Foundation
 
