@@ -51,4 +51,10 @@ public class TripController {
         Map<String,Object> row=rows.get(0); Instant captured=((java.sql.Timestamp)row.get("captured_at")).toInstant();
         return Map.of("tripId",tripId,"latitude",row.get("latitude"),"longitude",row.get("longitude"),"capturedAt",captured,"speed",row.get("speed"),"heading",row.get("heading"),"accuracy",row.get("accuracy"),"stale",captured.isBefore(Instant.now().minusSeconds(60)));
     }
+
+    @GetMapping("/route/{routeId}/active")
+    public Map<String,Object> activeForRoute(@PathVariable String routeId){
+        List<Map<String,Object>> rows=jdbc.queryForList("SELECT id,bus_id,started_at FROM trips WHERE route_id=? AND status='STARTED' ORDER BY started_at DESC LIMIT 1",routeId);
+        return rows.isEmpty()?Map.of("active",false):Map.of("active",true,"tripId",rows.get(0).get("id"),"busId",rows.get(0).get("bus_id"),"startedAt",rows.get(0).get("started_at"));
+    }
 }

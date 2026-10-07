@@ -34,6 +34,16 @@ export async function getLatestLocation(token:string, tripId:string) {
   if(!response.ok) throw new Error('Unable to load live location');
   return response.json() as Promise<{tripId:string;latitude?:number;longitude?:number;stale:boolean}>;
 }
+export async function getActiveTrip(token:string, routeId:string) {
+  const response=await fetch(API_URL + '/api/v1/trips/route/' + routeId + '/active',{headers:{Authorization:'Bearer ' + token}});
+  if(!response.ok) throw new Error('Unable to load active trip');
+  return response.json() as Promise<{active:boolean;tripId?:string}>;
+}
+export async function getEta(token:string,tripId:string,stopId:string,leadMinutes:number) {
+  const response=await fetch(API_URL + '/api/v1/trips/' + tripId + '/eta?stopId=' + encodeURIComponent(stopId) + '&leadMinutes=' + leadMinutes,{headers:{Authorization:'Bearer ' + token}});
+  if(!response.ok) throw new Error('Unable to calculate ETA');
+  return response.json() as Promise<{etaMinutes?:number;stale?:boolean}>;
+}
 export async function saveSubscription(token:string, studentId:string, stopId:string, leadMinutes:number) {
   const response=await fetch(API_URL + '/api/v1/subscription',{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer ' + token},body:JSON.stringify({studentId,stopId,leadMinutes})});
   if(!response.ok) throw new Error('Unable to save alarm');
