@@ -21,6 +21,7 @@
 - [x] Persist access token securely and add university/route/stop client helpers.
 - [x] Add foreground driver GPS publishing helper with permission and bearer token handling.
 - [x] Add authenticated latest-location and alarm-subscription client methods.
+- [x] Add authenticated notification polling for unread alerts.
 
 ## Foundation
 
