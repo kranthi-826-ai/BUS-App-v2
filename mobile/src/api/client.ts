@@ -39,3 +39,8 @@ export async function saveSubscription(token:string, studentId:string, stopId:st
   if(!response.ok) throw new Error('Unable to save alarm');
   return response.json();
 }
+export async function getNotifications(token:string, studentId:string) {
+  const response=await fetch(API_URL + '/api/v1/notifications?studentId=' + encodeURIComponent(studentId),{headers:{Authorization:'Bearer ' + token}});
+  if(!response.ok) throw new Error('Unable to load notifications');
+  return response.json() as Promise<Array<{id:string;message:string;read:boolean;createdAt:string}>>;
+}
