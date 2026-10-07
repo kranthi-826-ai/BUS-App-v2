@@ -20,3 +20,8 @@
 - Added strict coordinate, freshness, accuracy, speed, future-time, and ordering validation.
 - Added automated rejection tests.
 - Added an explicitly empty Route 8 seed placeholder; verified college stop data is still required.
+
+## Phase 3 transport read APIs
+
+- Added university, route, and stop read endpoints.
+- Added clearly labelled demo university/Route 8 seed metadata without invented stop coordinates.
