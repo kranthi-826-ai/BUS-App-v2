@@ -23,7 +23,9 @@
 - [x] Add authenticated latest-location and alarm-subscription client methods.
 - [x] Add authenticated notification polling for unread alerts.
 - [x] Persist pending driver locations locally and retry them in ordered batches.
-- [ ] Register device push tokens and deliver push notifications.
+- [x] Add physical-device Expo push registration and local arrival-alarm helpers.
+- [x] Add minimized-app driver GPS task with Android foreground-service configuration.
+- [ ] Persist push tokens in the backend and send server-triggered push notifications.
 - [x] Add production-style backend Docker image and API/MySQL compose stack.
 - [ ] Verify Docker image with a running local Docker engine.
 - [x] Add GitHub Actions gates for backend tests and mobile strict type checking.
