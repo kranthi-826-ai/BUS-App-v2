@@ -12,6 +12,7 @@
 - [x] Phase 7b: authenticated mobile API client foundation
 - [ ] Phase 7c: background GPS, offline queue, push delivery
 - [ ] Phase 8: admin, deployment, APK, physical two-phone Definition of Done
+- [x] Add an admin-only operational dashboard API.
 
 ### Phase 7b current work
 
