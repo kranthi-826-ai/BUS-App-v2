@@ -11,6 +11,9 @@ All endpoints use `/api/v1`, JSON, UTC ISO-8601 timestamps, and structured error
 - `GET /routes/{id}/stops`
 - `POST /trips/start`
 - `POST /trips/{id}/locations/batch`
+- `POST /trips/start`
+- `POST /trips/{id}/end`
+- `GET /trips/{id}/locations/latest`
 - `GET /routes/{id}/live`
 - `PUT /subscription`
 - `GET /notifications`

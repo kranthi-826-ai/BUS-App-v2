@@ -25,3 +25,9 @@
 
 - Added university, route, and stop read endpoints.
 - Added clearly labelled demo university/Route 8 seed metadata without invented stop coordinates.
+
+## Phase 4 trip/location API
+
+- Added trip start/end endpoints.
+- Added ordered batch location ingestion with accepted/rejected counts.
+- Added latest-location retrieval with stale-state calculation.
