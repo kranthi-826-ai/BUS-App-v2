@@ -29,3 +29,13 @@ export async function startTrip(token:string, routeId:string, driverId:string, b
   if(!response.ok) throw new Error('Unable to start trip'); const result=await response.json() as {id:string}; return {tripId:result.id};
 }
 export async function endTrip(token:string, tripId:string) { await fetch(`${API_URL}/api/v1/trips/${tripId}/end`,{method:'POST',headers:{Authorization:`Bearer ${token}`}}); }
+export async function getLatestLocation(token:string, tripId:string) {
+  const response=await fetch(API_URL + '/api/v1/trips/' + tripId + '/locations/latest',{headers:{Authorization:'Bearer ' + token}});
+  if(!response.ok) throw new Error('Unable to load live location');
+  return response.json() as Promise<{tripId:string;latitude?:number;longitude?:number;stale:boolean}>;
+}
+export async function saveSubscription(token:string, studentId:string, stopId:string, leadMinutes:number) {
+  const response=await fetch(API_URL + '/api/v1/subscription',{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer ' + token},body:JSON.stringify({studentId,stopId,leadMinutes})});
+  if(!response.ok) throw new Error('Unable to save alarm');
+  return response.json();
+}
