@@ -22,6 +22,8 @@
 - [x] Add foreground driver GPS publishing helper with permission and bearer token handling.
 - [x] Add authenticated latest-location and alarm-subscription client methods.
 - [x] Add authenticated notification polling for unread alerts.
+- [x] Persist pending driver locations locally and retry them in ordered batches.
+- [ ] Register device push tokens and deliver push notifications.
 
 ## Foundation
 
