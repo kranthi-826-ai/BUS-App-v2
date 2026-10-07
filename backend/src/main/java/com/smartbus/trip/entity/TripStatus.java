@@ -1,5 +1,5 @@
 package com.smartbus.trip.entity;
 
 public enum TripStatus {
-    ACTIVE, ENDED, CANCELLED
+    ACTIVE, PAUSED, ENDED, CANCELLED
 }

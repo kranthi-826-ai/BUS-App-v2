@@ -3,9 +3,17 @@ import com.smartbus.transport.entity.BusRouteAssignment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import com.smartbus.transport.entity.Bus;
+import java.util.List;
 import java.time.LocalDate;
 
 public interface BusRouteAssignmentRepository extends JpaRepository<BusRouteAssignment, String> {
+       @Query("SELECT COUNT(a) > 0 FROM BusRouteAssignment a WHERE a.bus.id = :busId AND a.route.id = :routeId AND a.validFrom <= :date AND (a.validTo IS NULL OR a.validTo >= :date)")
+       boolean hasActiveAssignment(@Param("busId") String busId, @Param("routeId") String routeId, @Param("date") LocalDate date);
+
+       @Query("SELECT a.bus FROM BusRouteAssignment a WHERE a.route.id = :routeId AND a.validFrom <= :date AND (a.validTo IS NULL OR a.validTo >= :date) AND a.bus.active = true")
+       List<Bus> findActiveBusesForRoute(@Param("routeId") String routeId, @Param("date") LocalDate date);
+
     @Query("SELECT COUNT(a) > 0 FROM BusRouteAssignment a WHERE a.bus.id = :busId AND " +
            "(cast(:validTo as date) IS NULL OR a.validFrom <= :validTo) AND " +
            "(a.validTo IS NULL OR a.validTo >= :validFrom)")

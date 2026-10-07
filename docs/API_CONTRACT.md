@@ -34,6 +34,10 @@ Base path: `/api/v1`. The implementation milestone must create `contracts/openap
 | `PUT /me/boarding-stop` | student | Select enrolled-bus stop |
 | `PUT /me/alert-subscription` | student | Enable/radius/push token |
 | `POST /trips` | in-charge | Start assigned-bus trip; requires idempotency key |
+| `GET /trips/active` | signed in | Active trips visible only to bus enrollees, assigned in-charges, and administrators |
+| `POST /trips/{tripId}/pause` | in-charge | Pause an active trip and stop location publishing |
+| `POST /trips/{tripId}/resume` | in-charge | Resume a paused trip |
+| `POST /trips/{tripId}/end` | in-charge | End an active or paused trip |
 | `POST /trips/{tripId}/locations:batch` | in-charge | Ingest one or more sequenced GPS points |
 | `POST /trips/{tripId}/end` | in-charge | End trip; idempotent |
 | `GET /buses/{busId}/active-trip` | enrolled/assigned | Active trip summary |
@@ -71,3 +75,6 @@ Backend validates coordinate ranges, finite numbers, assigned device/user/bus/tr
 - `GET /attendance/me`
 - `GET /trips/{tripId}/attendance/report.csv`
 - `POST /ai/face-verifications` only when the feature flag and privacy gate are enabled.
+### Authorized external tracking adapter
+
+When the college supplies an authorized JSON tracking API, configure `EXTERNAL_TRACKING_ENABLED`, `EXTERNAL_TRACKING_BASE_URL`, and `EXTERNAL_TRACKING_API_TOKEN`. The provider must implement `GET {baseUrl}/buses/{busId}/location` and return `busId`, `latitude`, `longitude`, `capturedTime` (ISO-8601), plus optional `accuracy`, `speed`, and `heading`. The backend rejects wrong-bus, invalid-coordinate, future, or older-than-10-minute responses. Public share pages are not accepted as an API.

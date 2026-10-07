@@ -14,7 +14,7 @@
   <name>backend</name>
   <description>Smart College Bus Backend</description>
   <properties>
-    <java.version>25</java.version>
+    <java.version>21</java.version>
     <lombok.version>1.18.48</lombok.version>
   </properties>
   <dependencies>
@@ -102,9 +102,13 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <scope>test</scope>
+      <scope>runtime</scope>
     </dependency>
-  </dependencies>
+    <dependency>
+    <groupId>com.fasterxml.jackson.datatype</groupId>
+    <artifactId>jackson-datatype-hibernate6</artifactId>
+  </dependency>
+</dependencies>
   <build>
     <plugins>
       <plugin>
@@ -127,3 +131,4 @@
     </plugins>
   </build>
 </project>
+

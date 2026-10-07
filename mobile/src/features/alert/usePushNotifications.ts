@@ -63,7 +63,12 @@ async function registerForPushNotificationsAsync() {
       console.log('Failed to get push token for push notification!');
       return;
     }
-    token = (await Notifications.getExpoPushTokenAsync({ projectId: 'your-project-id' })).data;
+    try {
+      token = (await Notifications.getExpoPushTokenAsync({ projectId: '11111111-2222-3333-4444-555555555555' })).data;
+    } catch (error) {
+      console.log('Using mock push token since EAS project is not configured', error);
+      token = 'ExponentPushToken[mock-token-for-prototype]';
+    }
   } else {
     console.log('Must use physical device for Push Notifications');
   }

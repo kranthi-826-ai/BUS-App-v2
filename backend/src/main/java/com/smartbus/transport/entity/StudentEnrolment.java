@@ -10,8 +10,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 public class StudentEnrolment {
     @Id private String id;
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "student_id", nullable = false) private User student;
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "bus_id", nullable = false) private Bus bus;
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "selected_stop_id", nullable = false) private Stop selectedStop;
+    @ManyToOne(fetch = FetchType.EAGER) @JoinColumn(name = "bus_id", nullable = false) private Bus bus;
+    @ManyToOne(fetch = FetchType.EAGER) @JoinColumn(name = "selected_stop_id", nullable = false) private Stop selectedStop;
     @Column(nullable = false) private String status = "ACTIVE";
     @CreationTimestamp @Column(name = "created_at", nullable = false, updatable = false) private Instant createdAt;
     @UpdateTimestamp @Column(name = "updated_at", nullable = false) private Instant updatedAt;

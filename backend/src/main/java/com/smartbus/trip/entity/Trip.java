@@ -2,8 +2,10 @@ package com.smartbus.trip.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.AccessLevel;
+import lombok.Getter;
 import java.time.Instant;
-import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.domain.Persistable;
 import com.smartbus.transport.entity.Bus;
 import com.smartbus.transport.entity.Route;
 import com.smartbus.common.entity.User;
@@ -11,18 +13,20 @@ import com.smartbus.common.entity.User;
 @Data
 @Entity
 @Table(name = "trips")
-public class Trip {
+public class Trip implements Persistable<String> {
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(length = 36)
     private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Transient
+    @Getter(AccessLevel.NONE)
+    private boolean isNew = true;
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "bus_id", nullable = false)
     private Bus bus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "route_id", nullable = false)
     private Route route;
 
@@ -48,5 +52,16 @@ public class Trip {
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = Instant.now();
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    @PostPersist
+    @PostLoad
+    void markNotNew() {
+        isNew = false;
     }
 }

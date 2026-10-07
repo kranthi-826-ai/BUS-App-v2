@@ -23,6 +23,7 @@ const LOCATION_DEVICE_ID_KEY = 'location_device_id';
 const LOCATION_SEQUENCE_KEY = 'location_sequence';
 const MAX_QUEUED_POINTS = 100;
 const LOCATION_BATCH_SIZE = 20;
+let isQueueSyncInProgress = false;
 
 interface TrackingSession {
     tripId: string;
@@ -71,7 +72,11 @@ export const stopLocationTracking = async () => {
     if (isRegistered) {
         await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
     }
-    await syncOfflineQueue();
+    const sessionValue = await AsyncStorage.getItem(TRACKING_SESSION_KEY);
+    if (sessionValue) {
+        const session = JSON.parse(sessionValue) as TrackingSession;
+        await syncOfflineQueue(session);
+    }
     await AsyncStorage.removeItem(TRACKING_SESSION_KEY);
 };
 
@@ -99,24 +104,34 @@ const saveOfflineQueue = async (queue: LocationPoint[]) => {
     await AsyncStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(bounded));
 };
 
-const syncOfflineQueue = async () => {
-    let queue = await getOfflineQueue();
-    while (queue.length > 0) {
-        const sessionValue = await AsyncStorage.getItem(TRACKING_SESSION_KEY);
-        if (!sessionValue) return;
-        const session = JSON.parse(sessionValue) as TrackingSession;
-        const points = queue.filter((point) => point.tripId === session.tripId && point.deviceId === session.deviceId).slice(0, LOCATION_BATCH_SIZE);
-        if (points.length === 0) return;
+const syncOfflineQueue = async (session?: TrackingSession) => {
+    if (isQueueSyncInProgress) return;
+    isQueueSyncInProgress = true;
+    let queue: LocationPoint[] = [];
+    try {
+        queue = await getOfflineQueue();
+        while (queue.length > 0) {
+            let activeSession = session;
+            if (!activeSession) {
+                const sessionValue = await AsyncStorage.getItem(TRACKING_SESSION_KEY);
+                if (!sessionValue) return;
+                activeSession = JSON.parse(sessionValue) as TrackingSession;
+            }
+            const points = queue.filter((point) => point.tripId === activeSession.tripId && point.deviceId === activeSession.deviceId).slice(0, LOCATION_BATCH_SIZE);
+            if (points.length === 0) return;
 
-        try {
-            await submitLocations(session.tripId, session.deviceId, points);
-            const sentSequences = new Set(points.map((point) => point.sequenceNum));
-            queue = queue.filter((point) => !sentSequences.has(point.sequenceNum));
-            await saveOfflineQueue(queue);
-        } catch (e) {
-            console.warn('Failed to sync location updates; queued points will retry.', e);
-            return;
+            try {
+                await submitLocations(activeSession.tripId, activeSession.deviceId, points);
+                const sentSequences = new Set(points.map((point) => point.sequenceNum));
+                queue = queue.filter((point) => !sentSequences.has(point.sequenceNum));
+                await saveOfflineQueue(queue);
+            } catch (e) {
+                console.warn('Failed to sync location updates; queued points will retry.', e);
+                return;
+            }
         }
+    } finally {
+        isQueueSyncInProgress = false;
     }
 };
 
@@ -126,7 +141,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
         return;
     }
     
-    if (data && 'locations' in data && Array.isArray(data.locations)) {
+    if (typeof data === 'object' && data !== null && 'locations' in data && Array.isArray(data.locations)) {
         const sessionValue = await AsyncStorage.getItem(TRACKING_SESSION_KEY);
         if (!sessionValue) return;
         const session = JSON.parse(sessionValue) as TrackingSession;

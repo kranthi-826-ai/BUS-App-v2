@@ -14,6 +14,10 @@ Verified on 2026-10-01. Re-check official release pages before scaffolding and r
 | API docs | springdoc/OpenAPI | Compatible stable | Contract committed in `contracts/openapi.yaml` |
 | Tests | JUnit, Testcontainers, Jest, React Native Testing Library | Compatible stable | Free/open source; device acceptance remains mandatory |
 | API client | Bruno collection + CLI | Current stable | Open-source, commit-friendly alternative to manual-only Postman work |
+
+## Route 8 live-share integration boundary
+
+The supplied Fleetx share page (`TG08V3626`, route identified by the user as Route 8 / Mothi Nagar) is a read-only browser page. It showed the vehicle device as discharged and the visible map position was approximately a day old (`17.545862, 78.404297`). This is not a current GPS feed, verified stop coordinate, or documented API. Never store this sample as the bus's latest/live location. A direct Fleetx integration requires a college/vendor-authorized telemetry API or credential and an approved data-sharing contract. Until then, live location comes from the in-charge phone through the existing authenticated trip-location API.
 | CI | GitHub Actions | Current | Free for public repositories; quotas apply to private repositories |
 | Monitoring | Spring Actuator + Micrometer/Prometheus/Grafana | Optional pilot profile | Self-hostable; structured JSON logs always enabled |
 | Build agent | Gemini CLI/Antigravity with Gemini 3.1 Pro | `gemini-3.1-pro-preview` | Model is preview; Antigravity free-plan limits may apply; direct API is not assumed free |

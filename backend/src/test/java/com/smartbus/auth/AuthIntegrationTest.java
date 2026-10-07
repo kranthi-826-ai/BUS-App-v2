@@ -9,6 +9,13 @@ import com.smartbus.common.entity.User;
 import com.smartbus.common.repository.CollegeRepository;
 import com.smartbus.common.repository.UserRepository;
 import com.smartbus.common.repository.RefreshTokenRepository;
+import com.smartbus.transport.repository.BusRouteAssignmentRepository;
+import com.smartbus.transport.repository.InchargeAssignmentRepository;
+import com.smartbus.transport.repository.StudentEnrolmentRepository;
+import com.smartbus.transport.repository.RouteStopRepository;
+import com.smartbus.transport.repository.StopRepository;
+import com.smartbus.transport.repository.BusRepository;
+import com.smartbus.transport.repository.RouteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +58,13 @@ public class AuthIntegrationTest {
 
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
+    @Autowired private InchargeAssignmentRepository inchargeAssignmentRepository;
+    @Autowired private StudentEnrolmentRepository studentEnrolmentRepository;
+    @Autowired private BusRouteAssignmentRepository busRouteAssignmentRepository;
+    @Autowired private RouteStopRepository routeStopRepository;
+    @Autowired private BusRepository busRepository;
+    @Autowired private RouteRepository routeRepository;
+    @Autowired private StopRepository stopRepository;
 
     private User activeUser;
     private User disabledUser;
@@ -58,6 +72,13 @@ public class AuthIntegrationTest {
     @BeforeEach
     void setup() {
         refreshTokenRepository.deleteAll();
+        inchargeAssignmentRepository.deleteAll();
+        studentEnrolmentRepository.deleteAll();
+        busRouteAssignmentRepository.deleteAll();
+        routeStopRepository.deleteAll();
+        busRepository.deleteAll();
+        routeRepository.deleteAll();
+        stopRepository.deleteAll();
         userRepository.deleteAll();
         collegeRepository.deleteAll();
 

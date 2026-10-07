@@ -6,6 +6,10 @@ import com.smartbus.common.repository.UserRepository;
 import com.smartbus.transport.entity.Bus;
 import com.smartbus.transport.entity.Route;
 import com.smartbus.transport.repository.BusRepository;
+import com.smartbus.transport.repository.BusRouteAssignmentRepository;
+import com.smartbus.transport.repository.RouteStopRepository;
+import com.smartbus.transport.repository.StopRepository;
+import com.smartbus.transport.repository.InchargeAssignmentRepository;
 import com.smartbus.transport.repository.RouteRepository;
 import com.smartbus.common.entity.College;
 import com.smartbus.common.repository.CollegeRepository;
@@ -62,6 +66,18 @@ public class TripIntegrationTest {
     private BusRepository busRepository;
 
     @Autowired
+    private BusRouteAssignmentRepository busRouteAssignmentRepository;
+
+    @Autowired
+    private RouteStopRepository routeStopRepository;
+
+    @Autowired
+    private StopRepository stopRepository;
+
+        @Autowired
+        private InchargeAssignmentRepository inchargeAssignmentRepository;
+
+    @Autowired
     private RouteRepository routeRepository;
 
     @Autowired
@@ -80,6 +96,10 @@ public class TripIntegrationTest {
         locationPointRepository.deleteAll(); tripRepository.deleteAll(); 
         latestBusLocationRepository.deleteAll();
         tripRepository.deleteAll();
+        busRouteAssignmentRepository.deleteAll();
+        routeStopRepository.deleteAll();
+        stopRepository.deleteAll();
+        inchargeAssignmentRepository.deleteAll();
         busRepository.deleteAll();
         routeRepository.deleteAll();
         userRepository.deleteAll();
@@ -113,6 +133,13 @@ public class TripIntegrationTest {
         testBus.setCapacity(50);
         testBus.setCollege(testCollege);
         testBus = busRepository.save(testBus);
+
+        com.smartbus.transport.entity.InchargeAssignment assignment = new com.smartbus.transport.entity.InchargeAssignment();
+        assignment.setId("assignment1");
+        assignment.setUser(testUser);
+        assignment.setBus(testBus);
+        assignment.setValidFrom(java.time.LocalDate.now().minusDays(1));
+        inchargeAssignmentRepository.save(assignment);
 
         testRoute = new Route();
         testRoute.setId("route1");

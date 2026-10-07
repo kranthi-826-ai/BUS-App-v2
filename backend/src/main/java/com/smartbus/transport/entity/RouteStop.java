@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 public class RouteStop {
     @Id private String id;
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "route_id", nullable = false) private Route route;
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "stop_id", nullable = false) private Stop stop;
+    @ManyToOne(fetch = FetchType.EAGER) @JoinColumn(name = "stop_id", nullable = false) private Stop stop;
     @Column(name = "sequence_num", nullable = false) private Integer sequenceNum;
     @Column(name = "scheduled_offset_mins") private Integer scheduledOffsetMins;
 

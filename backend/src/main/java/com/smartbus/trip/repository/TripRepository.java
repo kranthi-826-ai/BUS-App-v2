@@ -11,5 +11,6 @@ import java.util.Optional;
 @Repository
 public interface TripRepository extends JpaRepository<Trip, String> {
     Optional<Trip> findByBusIdAndStatus(String busId, TripStatus status);
+    Optional<Trip> findByIdAndStatus(String id, TripStatus status);
     List<Trip> findByStatus(TripStatus status);
 }

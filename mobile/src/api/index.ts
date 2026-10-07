@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { getAccessToken, getRefreshToken, saveTokens, clearTokens } from '../storage/secureStore';
 
-const BASE_URL = `${process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8080'}/api`;
+const API_ORIGIN = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8080';
+const BASE_URL = `${API_ORIGIN.replace(/\/$/, '')}/api`;
 
 export const api = axios.create({
     baseURL: BASE_URL,

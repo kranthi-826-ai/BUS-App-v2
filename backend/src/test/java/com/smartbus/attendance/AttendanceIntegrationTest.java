@@ -10,6 +10,11 @@ import com.smartbus.common.repository.UserRepository;
 import com.smartbus.transport.entity.Bus;
 import com.smartbus.transport.entity.Route;
 import com.smartbus.transport.repository.BusRepository;
+import com.smartbus.transport.repository.BusRouteAssignmentRepository;
+import com.smartbus.transport.repository.InchargeAssignmentRepository;
+import com.smartbus.transport.repository.StudentEnrolmentRepository;
+import com.smartbus.transport.repository.RouteStopRepository;
+import com.smartbus.transport.repository.StopRepository;
 import com.smartbus.transport.repository.RouteRepository;
 import com.smartbus.trip.entity.Trip;
 import com.smartbus.trip.repository.TripRepository;
@@ -34,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@org.springframework.test.annotation.DirtiesContext(classMode = org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @org.springframework.transaction.annotation.Transactional
 public class AttendanceIntegrationTest {
 
@@ -52,6 +58,12 @@ public class AttendanceIntegrationTest {
     @Autowired
     private BusRepository busRepository;
 
+    @Autowired private BusRouteAssignmentRepository busRouteAssignmentRepository;
+    @Autowired private InchargeAssignmentRepository inchargeAssignmentRepository;
+    @Autowired private StudentEnrolmentRepository studentEnrolmentRepository;
+    @Autowired private RouteStopRepository routeStopRepository;
+    @Autowired private StopRepository stopRepository;
+
     @Autowired
     private RouteRepository routeRepository;
 
@@ -69,8 +81,13 @@ public class AttendanceIntegrationTest {
     void setUp() {
         attendanceRecordRepository.deleteAll();
         tripRepository.deleteAll();
+        inchargeAssignmentRepository.deleteAll();
+        studentEnrolmentRepository.deleteAll();
+        busRouteAssignmentRepository.deleteAll();
+        routeStopRepository.deleteAll();
         busRepository.deleteAll();
         routeRepository.deleteAll();
+        stopRepository.deleteAll();
         userRepository.deleteAll();
         collegeRepository.deleteAll();
 
@@ -97,7 +114,7 @@ public class AttendanceIntegrationTest {
 
         testStudent = new User();
         testStudent.setId("student1");
-        testStudent.setEmail("student@test.com");
+        testStudent.setEmail("attendance-student@test.com");
         testStudent.setName("Student");
         testStudent.setRole("STUDENT");
         testStudent.setPasswordHash("pass");

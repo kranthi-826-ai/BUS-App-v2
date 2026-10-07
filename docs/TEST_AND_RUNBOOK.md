@@ -61,6 +61,12 @@ Test at least one stock Android/Pixel-like device and one actual vendor device i
 - **Flyway validation failed:** edited an applied migration. Restore it and add a new migration.
 - **401 loop:** refresh rotation/revocation bug. Clear tokens once, inspect server audit, and test reuse handling; never weaken auth.
 
+## Route 8 (Mothi Nagar) Fleetx shared link
+
+The supplied public Fleetx page identifies one vehicle, `TG08V3626` (Tata Marco Polo), and reports it as **Discharged** with its internal battery discharged and its last location update approximately a day old. The page's Google Maps link exposes `17.545862, 78.404297`; treat this only as an approximate historical map position, not a verified current GPS fix or a Mothi Nagar boarding-stop coordinate. Do not seed it into `latest_bus_locations` or show it as live.
+
+This link is a read-only Fleetx share page, not a documented location-feed/API contract. No bus telemetry should be copied into the application database until the college/Fleetx provides an authorized integration/API and the tracking device is reporting. For the pilot, route 8 must publish authenticated GPS updates from the assigned in-charge's Android phone using the app trip/location endpoints. Configure the route name and verified stop coordinates separately from GPS observations. Re-check the Fleetx share page on the day of any device troubleshooting because this share link expires.
+
 ## Incident rule
 
 Location leak, credential exposure, unauthorized cross-college access, or incorrect active-trip assignment is release-blocking. Disable the affected feature, preserve non-sensitive evidence, rotate exposed credentials, fix with a regression test, and only then resume the pilot.

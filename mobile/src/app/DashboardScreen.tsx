@@ -10,6 +10,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../features/auth/AuthContext';
 import { api } from '../api';
 import { getLatestLocation } from '../api/trip';
@@ -18,6 +19,12 @@ interface ActiveTrip {
   id: string;
   busId: string;
   routeId: string;
+  status: string;
+}
+
+interface Enrollment {
+  busId: string;
+  selectedStopId: string;
   status: string;
 }
 
@@ -55,6 +62,7 @@ export const DashboardScreen = () => {
   const { logout } = useAuth();
   const navigation = useNavigation<any>();
   const [activeTrip, setActiveTrip] = useState<ActiveTrip | null>(null);
+  const [enrollment, setEnrollment] = useState<Enrollment | null>(null);
   const [location, setLocation] = useState<LiveLocation | null>(null);
   const [stops, setStops] = useState<RouteStop[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,8 +71,14 @@ export const DashboardScreen = () => {
 
   const refreshLiveTrip = useCallback(async () => {
     try {
-      const { data: trips } = await api.get<ActiveTrip[]>('/trips/active');
-      const trip = trips.find((item) => item.status === 'ACTIVE') ?? null;
+      const [tripsResponse, enrollmentResponse] = await Promise.all([
+        api.get<ActiveTrip[]>('/v1/trips/active'),
+        api.get<Enrollment | null>('/transport/enrolments/me').catch((): { data: null } => ({ data: null })),
+      ]);
+      const enrolledBus = enrollmentResponse.data;
+      setEnrollment(enrolledBus);
+      const trip = tripsResponse.data.find((item) => item.status === 'ACTIVE'
+        && (!enrolledBus || item.busId === enrolledBus.busId)) ?? null;
       setActiveTrip(trip);
       setErrorMessage(null);
 
@@ -75,7 +89,7 @@ export const DashboardScreen = () => {
       }
 
       const [latestLocation, routeStops] = await Promise.all([
-        getLatestLocation(trip.id).catch(() => null),
+        getLatestLocation(trip.id).catch((): null => null),
         api.get<RouteStop[]>(`/transport/routes/${trip.routeId}/stops`).then((response) => response.data),
       ]);
       setLocation(latestLocation);
@@ -86,6 +100,11 @@ export const DashboardScreen = () => {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    const refreshOnFocus = navigation.addListener('focus', () => void refreshLiveTrip());
+    return refreshOnFocus;
+  }, [navigation, refreshLiveTrip]);
 
   useEffect(() => {
     void refreshLiveTrip();
@@ -112,7 +131,7 @@ export const DashboardScreen = () => {
       <MapView
         style={styles.map}
         region={mapRegion}
-        showsUserLocation={false}
+        showsUserLocation={true}
         provider={PROVIDER_GOOGLE}
         showsCompass
         toolbarEnabled={false}
@@ -122,23 +141,34 @@ export const DashboardScreen = () => {
             coordinate={{ latitude: location.latitude, longitude: location.longitude }}
             title="Live bus location"
             description={activeTrip ? `Trip ${activeTrip.id}` : 'Active bus'}
-          />
+            anchor={{ x: 0.5, y: 0.5 }}
+          >
+            <View style={styles.busMarker}>
+              <Ionicons name="bus" size={20} color="#fff" />
+            </View>
+          </Marker>
         )}
         {stops.map(({ id, sequenceNum, stop }) => (
           <Marker
             key={id}
             coordinate={{ latitude: stop.latitude, longitude: stop.longitude }}
             title={`${sequenceNum}. ${stop.name}`}
-            pinColor="#526179"
-          />
+            anchor={{ x: 0.5, y: 0.5 }}
+          >
+            <View style={styles.stopMarker}>
+              <View style={styles.stopMarkerInner} />
+            </View>
+          </Marker>
         ))}
       </MapView>
 
       <View style={styles.topActions}>
         <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('AlertSettings')}>
+          <Ionicons name="notifications-outline" size={18} color="#142d2b" style={{marginRight: 6}} />
           <Text style={styles.actionText}>Alerts</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton} onPress={() => void refreshLiveTrip()} accessibilityLabel="Refresh bus location">
+          <Ionicons name="refresh-outline" size={18} color="#142d2b" style={{marginRight: 6}} />
           <Text style={styles.actionText}>Refresh</Text>
         </TouchableOpacity>
       </View>
@@ -173,8 +203,12 @@ export const DashboardScreen = () => {
             </View>
           ) : (
             <View style={styles.statusCard}>
-              <Text style={styles.statusTitle}>No active trip</Text>
-              <Text style={styles.statusText}>A bus location will appear here when your in-charge starts a trip.</Text>
+              <Text style={styles.statusTitle}>{enrollment ? 'Bus not on a trip' : 'Choose your bus'}</Text>
+              <Text style={styles.statusText}>
+                {enrollment
+                  ? 'Your selected bus will appear here when the in-charge starts a trip.'
+                  : 'Select an available route and boarding stop to join your college bus.'}
+              </Text>
             </View>
           )}
 
@@ -202,12 +236,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     minHeight: 44,
     justifyContent: 'center',
     paddingHorizontal: 18,
     borderRadius: 24,
     backgroundColor: '#fff',
     elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4
   },
   actionText: { color: '#142d2b', fontSize: 15, fontWeight: '700' },
   bottomSheet: { elevation: 10, shadowColor: '#000', shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.12 },
@@ -227,4 +267,7 @@ const styles = StyleSheet.create({
   primaryButtonText: { color: '#fff', fontSize: 15, fontWeight: '700' },
   secondaryButton: { minHeight: 44, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
   secondaryButtonText: { color: '#687671', fontSize: 14, fontWeight: '600' },
+  busMarker: { backgroundColor: '#18332a', padding: 8, borderRadius: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5, borderWidth: 2, borderColor: '#fff' },
+  stopMarker: { width: 16, height: 16, borderRadius: 8, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 1.41, elevation: 2 },
+  stopMarkerInner: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#18864b' },
 });

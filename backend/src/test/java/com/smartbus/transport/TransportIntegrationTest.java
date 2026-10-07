@@ -14,6 +14,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.UUID;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -49,6 +52,7 @@ public class TransportIntegrationTest {
         user.setName("Test User");
         user.setEmail(UUID.randomUUID().toString() + "@test.com");
         user.setRole(role);
+        user.setPasswordHash("test-hash");
         user.setCreatedAt(java.time.Instant.now());
         user.setUpdatedAt(java.time.Instant.now());
         entityManager.persist(user);
@@ -66,7 +70,7 @@ public class TransportIntegrationTest {
         busDto.capacity = 40;
         busDto.active = true;
         Bus bus = transportService.createBus(busDto);
-        
+
         RouteDTO routeDto = new RouteDTO();
         routeDto.collegeId = college.getId();
         routeDto.name = "Route 1";
@@ -150,6 +154,13 @@ public class TransportIntegrationTest {
         busDto.active = true;
         Bus bus = transportService.createBus(busDto);
 
+        RouteDTO routeDto = new RouteDTO();
+        routeDto.collegeId = college.getId();
+        routeDto.name = "Route 1";
+        routeDto.direction = "INBOUND";
+        routeDto.active = true;
+        Route route = transportService.createRoute(routeDto);
+
         StopDTO stopDto = new StopDTO();
         stopDto.collegeId = college.getId();
         stopDto.name = "Stop 1";
@@ -158,14 +169,72 @@ public class TransportIntegrationTest {
         stopDto.active = true;
         Stop stop = transportService.createStop(stopDto);
 
+        RouteStopDTO routeStop = new RouteStopDTO();
+        routeStop.routeId = route.getId();
+        routeStop.stopId = stop.getId();
+        routeStop.sequenceNum = 1;
+        transportService.createRouteStop(routeStop);
+
+        BusRouteAssignmentDTO busRoute = new BusRouteAssignmentDTO();
+        busRoute.busId = bus.getId();
+        busRoute.routeId = route.getId();
+        busRoute.validFrom = LocalDate.now().minusDays(1);
+        transportService.createBusRouteAssignment(busRoute);
+
         StudentEnrolmentDTO enrolDto = new StudentEnrolmentDTO();
-        enrolDto.studentId = student.getId();
         enrolDto.busId = bus.getId();
+        enrolDto.routeId = route.getId();
         enrolDto.selectedStopId = stop.getId();
-        enrolDto.status = "ACTIVE";
+
+        org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(
+            new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                student.getId(), "", java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_STUDENT"))));
         
-        StudentEnrolment enrolment = transportService.enrolStudent(enrolDto);
-        assertNotNull(enrolment.getId());
-        assertEquals("ACTIVE", enrolment.getStatus());
+        try {
+            StudentEnrolment enrolment = transportService.enrolStudent(enrolDto);
+            assertNotNull(enrolment.getId());
+            assertEquals("ACTIVE", enrolment.getStatus());
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
+    }
+
+    @Test
+    void studentCannotEnrollUsingStopFromAnotherCollege() {
+        College college = createCollege();
+        College otherCollege = createCollege();
+        User student = createUser(college, "STUDENT");
+
+        BusDTO busDto = new BusDTO();
+        busDto.collegeId = college.getId();
+        busDto.registrationNumber = "STU-001";
+        busDto.displayName = "Student Bus";
+        Bus bus = transportService.createBus(busDto);
+
+        RouteDTO routeDto = new RouteDTO();
+        routeDto.collegeId = college.getId();
+        routeDto.name = "Student Route";
+        routeDto.direction = "INBOUND";
+        Route route = transportService.createRoute(routeDto);
+
+        StopDTO stopDto = new StopDTO();
+        stopDto.collegeId = otherCollege.getId();
+        stopDto.name = "Foreign Stop";
+        stopDto.latitude = 17.0;
+        stopDto.longitude = 78.0;
+        Stop foreignStop = transportService.createStop(stopDto);
+
+        SecurityContextHolder.getContext().setAuthentication(
+            new UsernamePasswordAuthenticationToken(student.getId(), "", java.util.List.of(
+                new SimpleGrantedAuthority("ROLE_STUDENT"))));
+        try {
+            StudentEnrolmentDTO request = new StudentEnrolmentDTO();
+            request.busId = bus.getId();
+            request.routeId = route.getId();
+            request.selectedStopId = foreignStop.getId();
+            assertThrows(IllegalArgumentException.class, () -> transportService.enrolStudent(request));
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
     }
 }

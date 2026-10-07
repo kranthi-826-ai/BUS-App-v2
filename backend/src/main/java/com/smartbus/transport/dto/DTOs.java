@@ -7,5 +7,5 @@ public class DTOs {
     public static class RouteStopDTO { public String id; public String routeId; public String stopId; public Integer sequenceNum; public Integer scheduledOffsetMins; }
     public static class BusRouteAssignmentDTO { public String id; public String busId; public String routeId; public LocalDate validFrom; public LocalDate validTo; }
     public static class InchargeAssignmentDTO { public String id; public String userId; public String busId; public LocalDate validFrom; public LocalDate validTo; }
-    public static class StudentEnrolmentDTO { public String id; public String studentId; public String busId; public String selectedStopId; public String status; }
+    public static class StudentEnrolmentDTO { public String id; public String studentId; public String busId; public String routeId; public String selectedStopId; public String status; }
 }

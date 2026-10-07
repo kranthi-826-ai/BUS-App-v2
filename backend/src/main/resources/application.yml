@@ -23,3 +23,11 @@ management:
 
 server:
   port: 8080
+
+smartbus:
+  external-tracking:
+    enabled: ${EXTERNAL_TRACKING_ENABLED:false}
+    provider: ${EXTERNAL_TRACKING_PROVIDER:none}
+    base-url: ${EXTERNAL_TRACKING_BASE_URL:}
+    api-token: ${EXTERNAL_TRACKING_API_TOKEN:}
+    poll-seconds: ${EXTERNAL_TRACKING_POLL_SECONDS:30}
