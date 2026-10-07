@@ -37,3 +37,8 @@
 - Added Haversine distance and ETA calculation.
 - Added minimum-speed handling so stopped buses never produce infinite ETA.
 - Added stale-location guard; stale data is never alert eligible.
+
+## Phase 6 subscriptions
+
+- Added student stop/lead-time subscription endpoint.
+- Added notification history and read-state endpoints.
