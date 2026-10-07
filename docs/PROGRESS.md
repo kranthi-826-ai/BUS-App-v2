@@ -14,3 +14,9 @@
 ## Phase 3 started
 
 - Added buses, trips, validated location storage, subscriptions, and notification uniqueness schema.
+
+## Phase 3 location validation
+
+- Added strict coordinate, freshness, accuracy, speed, future-time, and ordering validation.
+- Added automated rejection tests.
+- Added an explicitly empty Route 8 seed placeholder; verified college stop data is still required.
