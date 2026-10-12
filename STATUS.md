@@ -4,7 +4,7 @@ Updated: 2026-10-12 (Asia/Calcutta)
 
 ## Task 1 - Docker MySQL and backend
 
-Status: BLOCKED after three attempts.
+Status: VERIFIED after moving only the host MySQL port to 3307.
 
 Commands and actual evidence:
 
@@ -17,7 +17,15 @@ Commands and actual evidence:
 4. Inspected with `docker compose ps -a`, then ran `docker compose start`.
    Output: `backend-mysql-1` and `backend-api-1` were in Created state; MySQL could not start because host port 3306 is already in use.
 
-Health, Flyway migration, and insert/read proof are therefore not yet available. No success is claimed.
+Resolution and proof:
+
+- Changed Compose host mapping to `3307:3306`; the backend still connects internally to `mysql:3306`.
+- Fixed the JPA/Flyway user-ID mapping by declaring the entity identifier as `CHAR(36)`.
+- `docker compose ps`: MySQL and API both reported `healthy`; API exposed port 8080 and MySQL exposed host port 3307.
+- Backend log: `Successfully validated 5 migrations`, schema version 5, application started.
+- `Invoke-RestMethod http://127.0.0.1:8080/actuator/health`: `{"status":"UP"}`.
+- MySQL verification showed Flyway versions 1 through 5 with `success=1`.
+- Temporary insert/read probe output: `1 insert-read-ok`.
 
 ## Task 2 - Route 8 stop import
 

@@ -28,7 +28,7 @@
 - [x] Add minimized-app driver GPS task with Android foreground-service configuration.
 - [x] Persist Expo device tokens and submit push messages after a newly eligible alert.
 - [x] Add production-style backend Docker image and API/MySQL compose stack.
-- [ ] Verify Docker image with a running local Docker engine.
+- [x] Verify Docker image, MySQL/Flyway migrations, health endpoint, and database insert/read using host MySQL port 3307.
 - [x] Add GitHub Actions gates for backend tests and mobile strict type checking.
 - [x] Add JWT signature/claim and filter authentication regression tests.
 - [x] Route administrators into the visible mobile operations dashboard.

@@ -5,7 +5,7 @@ import java.util.UUID;
 
 @Entity @Table(name="app_users")
 public class UserEntity {
-    @Id private String id = UUID.randomUUID().toString();
+    @Id @Column(columnDefinition="char(36)") private String id = UUID.randomUUID().toString();
     @Column(nullable=false, unique=true) private String email;
     @Column(name="password_hash", nullable=false) private String passwordHash;
     @Column(nullable=false) private String role;

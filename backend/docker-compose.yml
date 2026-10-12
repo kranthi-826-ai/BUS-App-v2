@@ -6,7 +6,7 @@ services:
       MYSQL_USER: smartbus
       MYSQL_PASSWORD: smartbus_dev_only
       MYSQL_ROOT_PASSWORD: root_dev_only
-    ports: ["3306:3306"]
+    ports: ["3307:3306"]
     volumes: ["smartbus_mysql:/var/lib/mysql"]
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-usmartbus", "-psmartbus_dev_only"]
