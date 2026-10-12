@@ -66,6 +66,14 @@ Status: BLOCKED BY RELEASE CREDENTIALS.
 - Actual output: exit code 0; Expo SDK 57 configuration, Android package `com.smartbus.collegealarm`, location/background-service permissions, notification plugin, and secure-store plugin were resolved successfully.
 - No EAS build was submitted and no download URL exists.
 
+Local APK attempts:
+
+1. `gradlew assembleDebug --no-daemon` failed because `NODE_ENV` was absent and Windows exceeded the 260-character native object path.
+2. Retried from temporary short drive `Z:` with `NODE_ENV=production`; compilation completed far enough to reveal the pre-existing native package `com.anonymous.mobile`.
+3. Corrected the Android namespace/application ID to `com.smartbus.collegealarm`, corrected Kotlin package declarations, and regenerated. Gradle then failed because React Native codegen resolved dependencies across both `Z:` and the physical `C:` path, producing different-root and missing-codegen-directory errors.
+
+The older APK under build output is not reported as a release artifact because its package was `com.anonymous.mobile` and predates the current source. A valid current APK remains blocked on EAS credentials or a clean short physical checkout/build environment.
+
 ## Task 6 - Two-phone test plan and diagnostics
 
 Status: VERIFIED IMPLEMENTATION; EXECUTION PENDING DEVICES.
